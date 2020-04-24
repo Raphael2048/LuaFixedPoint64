@@ -118,7 +118,7 @@ static fp64_t fpsqrt(fp64_t value)
     uint64_t bit;
     uint8_t n;
 
-    //大部分值不会大于65535
+    //most values <= 65535
     if (num & 0xFFFF000000000000)
         bit = (uint64_t)1 << 62;
     else
@@ -143,7 +143,7 @@ static fp64_t fpsqrt(fp64_t value)
 
         if (n == 0)
         {
-            //算最后小数16位,提高精度
+            //frac last 16bits
             if (num > 0xFFFFFFFF)
             {
                 num -= result;
@@ -172,7 +172,6 @@ static fp64_t fpsin(fp64_t value)
 {
     fp64_t temp = value % (fp64_pitimes2);
     if (temp < 0) temp += fp64_pitimes2;
-    fp64_t out;
     bool  sign = true;
     if (temp >= fp64_pi) {
         temp -= fp64_pi;
@@ -190,7 +189,7 @@ static fp64_t fpsin(fp64_t value)
         fp64_t b = index == sin_lut_count ? fp64_one : sin_lut[index + 1];
         result = fpmul(a, fp64_one - frac) + fpmul(b, frac);
     }
-    return result;
+    return sign ? result : -result;
 }
 
 static fp64_t fpcos(fp64_t value)
@@ -622,11 +621,6 @@ static int _fp64clamp(lua_State * L)
     return 1;
 }
 
-
-static int _fp64pow(lua_State* L)
-{
-}
-
 static int _fp64eq(lua_State* L)
 {
     fp64_t lhs = *(fp64_t*)lua_touserdata(L, 1);     
@@ -664,7 +658,7 @@ static int _fp64tohex(lua_State* L)
 {
     fp64_t n = tofp64(L, 1);    
     char temp[32];
-    sprintf(temp, "0x%llu", n);
+    sprintf(temp, "%llx", n);
     lua_pushstring(L, temp);
     return 1;
 }
@@ -827,13 +821,13 @@ static const struct luaL_Reg lib_fp64_meta [] = {
     {"__add", _fp64add},
     {"__sub", _fp64sub},
     {"__mul", _fp64mul},
+    {"__div", _fp64div},
     {"__mod", _fp64mod},
-    {"__unm", _fp64add},
+    {"__unm", _fp64unm},
     {"__eq", _fp64eq},
     {"__lt", _fp64lt},
     {"__le", _fp64le},
     {"__tostring", _fp64tostring},
-    {"__pow", _fp64pow},
     {"__index", NULL},
     {NULL, NULL}
 };

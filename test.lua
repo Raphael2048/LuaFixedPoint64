@@ -1,7 +1,10 @@
 fp64 = require("fp64")
 
 local f = fp64.new(5.259451158)
-print(f)
+f= f / 5
+f = -f
+f = f * 3
+f= f:sin()
 print(f + fp64.pi)
 print(fp64.tan(6))
 print(f:tonumber())
