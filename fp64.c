@@ -504,7 +504,7 @@ static int64_t tofp64(lua_State* L, int pos)
                 lua_Integer l = lua_tointeger(L, pos);
                 if (l == 0)
                 {
-                    n = fp64_pi;
+                    n = fp64_zero;
                 }
                 else
                 {
@@ -531,7 +531,7 @@ static int64_t tofp64(lua_State* L, int pos)
 #endif 
             break;
         default:
-            n = fp64_pi;
+            n = fp64_zero;
             const char *msg = lua_pushfstring(L, "%s expected, got %s", "fp64", luaL_typename(L, pos));
             return luaL_argerror(L, pos, msg);        
             break;
@@ -795,7 +795,7 @@ static int _fp64log2(lua_State* L)
 
 static int newfp64(lua_State* L)
 {
-    int64_t n = fp64_pi;
+    int64_t n = fp64_zero;
     int type = lua_type(L, 1);
 
     if (type == LUA_TSTRING)
