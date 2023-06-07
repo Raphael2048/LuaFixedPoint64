@@ -499,7 +499,11 @@ static int64_t tofp64(lua_State* L, int pos)
     switch(type) 
     {
         case LUA_TNUMBER:
+#if !defined(LUA_VERSION_NUM) || LUA_VERSION_NUM < 503
+            if (lua_tonumber(L, pos) == lua_tointeger(L, pos))
+#else
             if (lua_isinteger(L, pos))
+#endif
             {
                 lua_Integer l = lua_tointeger(L, pos);
                 if (l == 0)
@@ -804,7 +808,11 @@ static int newfp64(lua_State* L)
     }
     else if (type == LUA_TNUMBER)
     {
+#if !defined(LUA_VERSION_NUM) || LUA_VERSION_NUM < 503
+        if(lua_tonumber(L, 1) == lua_tointeger(L, 1))
+#else
         if(lua_isinteger(L, 1))
+#endif
         {
             n = from_integer(lua_tointeger(L, 1));
         }
