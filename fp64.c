@@ -521,7 +521,7 @@ static int64_t tofp64(lua_State* L, int pos)
             }
             break;
         case LUA_TSTRING:
-            n = _parse_str(L, n);
+            n = _parse_str(L, pos);
             break;
 #ifdef USELIGHTUSERDATA
         case LUA_TLIGHTUSERDATA:
