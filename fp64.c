@@ -873,6 +873,40 @@ static const struct luaL_Reg lib_fp64 [] = {
     {NULL, NULL}
 };
 
+#if !defined(LUAJIT_VERSION) && LUA_VERSION_NUM < 502
+/* Compatibility for Lua 5.1 & Luajit.
+ *
+ * luaL_setfuncs() is used to create a module table where the functions have
+ * Code borrowed from Lua 5.2 source.
+ *
+ * For Lua 5.1 without JIT,
+ * use this luaL_setfuncs function from 5.2.
+ * For Lua 5.1 with JIT(Luajit),
+ * since Luajit already defines luaL_setfuncs, there is no need to redefine it here to avoid multiple definitions. */
+static void luaL_setfuncs(lua_State *l, const luaL_Reg *reg, int nup)
+{
+    int i;
+
+    luaL_checkstack(l, nup, "too many upvalues");
+    for (; reg->name != NULL; reg++)
+    {
+        for (i = 0; i < nup; i++)
+            lua_pushvalue(l, -nup);
+        lua_pushcclosure(l, reg->func, nup);
+        lua_setfield(l, -(nup + 2), reg->name);
+    }
+    lua_pop(l, nup);
+}
+#endif
+
+#if !defined(LUAJIT_VERSION) && LUA_VERSION_NUM < 502
+/* Compatibility for Lua 5.1 & Luajit.
+ *
+ * For Lua 5.1 without JIT, use this luaL_newlib defined here.
+ * For Lua 5.1 with JIT(Luajit), since Luajit already defines luaL_newlib, there is no need to redefine it here to avoid multiple definitions. */
+#define luaL_newlib(L, l) (lua_newtable(L), luaL_register(L, NULL, l))
+#endif
+
 int luaopen_fp64(lua_State* L)
 {
     luaL_newmetatable(L, "fp64");
